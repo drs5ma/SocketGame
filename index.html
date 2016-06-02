@@ -1,0 +1,120 @@
+<html>
+
+  <head>
+    <style>
+      body { margin: 0; }
+      canvas { width: 100%; height: 100% }
+    </style>
+    <script src="js/three.min.js"></script>
+
+  </head>
+
+
+
+  <body>
+    <script src="client.js"></script>
+    <script>
+
+      // Our Javascript will go here.
+      var scene = new THREE.Scene();
+      var width =  window.innerWidth;
+      var height = window.innerHeight;
+      //var camera = new THREE.PerspectiveCamera( 75,/, 0.1, 1000 );
+      var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      document.body.appendChild( renderer.domElement );
+      camera.position.z = 100;
+      var geometry = new THREE.BoxGeometry( 20, 20, 20);
+      var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+      window.addEventListener('keydown', handleKeyDown, false);
+      window.addEventListener('keyup', handleKeyUp, false);
+
+
+      var players = {};
+      //players = { {timestamp:, THREE.Object:}, {timestamp:, THREE.Object:} }
+      //the actual view objects, but this also holds the position data too.
+
+
+
+
+      function handleKeyDown(event) {
+        if (event.keyCode === 87) { //66 is "b"
+          window.isWDown = true;
+        }
+        if (event.keyCode === 65) { //66 is "b"
+          window.isADown = true;
+        }
+        if (event.keyCode === 83) { //66 is "b"
+          window.isSDown = true;
+        }
+        if (event.keyCode === 68) { //66 is "b"
+          window.isDDown = true;
+        }
+      }
+
+      function handleKeyUp(event) {
+        if (event.keyCode === 87) {
+          window.isWDown = false;
+        }
+        if (event.keyCode === 65) {
+          window.isADown = false;
+        }
+        if (event.keyCode === 83) {
+          window.isSDown = false;
+        }
+        if (event.keyCode === 68) {
+          window.isDDown = false;
+        }
+      }
+
+      function add_cube(cube_timestamp, position){
+        var newbox = new THREE.Mesh( geometry, material );
+        players[cube_timestamp] = newbox;
+        scene.add(players[cube_timestamp]);
+        players[cube_timestamp].position.set(position.x,position.y,position.z);
+
+      }
+
+      function move_cube(cube_timestamp, displacement){
+
+        players[cube_timestamp].position.add(displacement);
+        var new_position = players[cube_timestamp].position.clone();
+        //server_positions[cube_timestamp] = new_position;
+        return new_position;
+      }
+
+      function remove_cube(cube_timestamp){
+        scene.remove(players[cube_timestamp]);
+        delete players[cube_timestamp];
+        delete server_positions[cube_timestamp];
+      }
+
+      var render = function () {
+        requestAnimationFrame( render );
+        //console.log(players);
+        if(window.isWDown){
+            var vector_displacement = new THREE.Vector3( 0, 1, 0 );
+            send_server_move( vector_displacement );
+        }
+        if(window.isSDown){
+            var vector_displacement = new THREE.Vector3( 0, -1, 0 );
+            send_server_move( vector_displacement );
+        }
+        if(window.isADown){
+            var vector_displacement = new THREE.Vector3( -1, 0, 0 );
+            send_server_move( vector_displacement );
+        }
+        if(window.isDDown){
+            var vector_displacement = new THREE.Vector3( 1, 0, 0 );
+            send_server_move( vector_displacement );
+        }
+        renderer.render(scene, camera);
+      };
+      render();
+
+
+
+    </script>
+  </body>
+</html>

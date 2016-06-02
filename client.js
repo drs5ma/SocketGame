@@ -1,0 +1,70 @@
+
+var host = location.origin.replace(/^http/, 'ws')
+var ws = new WebSocket(host);
+
+//server_positions = { {timestamp:, THREE.Vector3:}, {timestamp:, THREE.Vector3:} }
+//this gets updated and is concurrent wiht the server ON client connect.
+//do we need to update this after connect? idont think so i think just
+//updating players will be sufficient
+var server_positions = {};
+      
+
+
+
+var my_unique_id;
+var my_start_position = new THREE.Vector3( 0, 1, 0 );
+
+
+function send_server_move(displacement){
+  var sendobj = {'msg':'client_move','content':{'timestamp':my_unique_id , 'displacement': displacement  }};
+  ws.send(JSON.stringify( sendobj ));
+}
+
+
+
+ws.onopen = function(){
+  my_unique_id =  Date.now();
+  ws.send( JSON.stringify(  {'msg':'client_join', 
+                             'content':{'timestamp':my_unique_id,'position':my_start_position}}  ));
+};
+
+
+ws.onmessage = function (event) {
+  var jsonobj = JSON.parse(event.data);
+  var msg = jsonobj.msg;
+  var content = jsonobj.content;
+
+  if (msg == 'send_userlist'){
+    server_positions = content.userlist;
+    for (var i in server_positions){
+      var timestamp = i;
+      var position = server_positions[i];
+      //add all users logged in except myself
+      if(timestamp != my_unique_id){
+        var newbox = new THREE.Mesh( geometry, material );
+        players[timestamp] = newbox;
+        scene.add(players[timestamp]);
+        players[timestamp].position.set(position.x,position.y,position.z);
+      }
+    }
+  }
+  else if(msg == 'broadcast_join'){
+    add_cube(content.timestamp, content.position);
+    //server_positions[content.timestamp] = content.position;
+  }
+  else if(msg=='broadcast_move'){
+    var new_position = move_cube(content.timestamp, content.displacement);
+    //server_positions[content.timestamp] = new_position;
+  }
+  else if(msg == 'broadcast_leave'){
+    remove_cube(content.timestamp);
+  }
+  else{
+    console.log("msg type unsupported")
+    // var timestamp = parseInt(jsonobj.content);
+    // var tone = (timestamp%1000)/(1000.0);
+    // color = new THREE.Color( tone, tone, tone );;
+  }
+};
+
+
