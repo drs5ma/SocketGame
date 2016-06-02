@@ -7,8 +7,6 @@ var ws = new WebSocket(host);
 //do we need to update this after connect? idont think so i think just
 //updating players will be sufficient
 var server_positions = {};
-      
-
 
 
 var my_unique_id;
@@ -41,20 +39,15 @@ ws.onmessage = function (event) {
       var position = server_positions[i];
       //add all users logged in except myself
       if(timestamp != my_unique_id){
-        var newbox = new THREE.Mesh( geometry, material );
-        players[timestamp] = newbox;
-        scene.add(players[timestamp]);
-        players[timestamp].position.set(position.x,position.y,position.z);
+        add_cube(timestamp, position);
       }
     }
   }
   else if(msg == 'broadcast_join'){
     add_cube(content.timestamp, content.position);
-    //server_positions[content.timestamp] = content.position;
   }
   else if(msg=='broadcast_move'){
     var new_position = move_cube(content.timestamp, content.displacement);
-    //server_positions[content.timestamp] = new_position;
   }
   else if(msg == 'broadcast_leave'){
     remove_cube(content.timestamp);

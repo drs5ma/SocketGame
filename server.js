@@ -46,29 +46,17 @@ wss.on("connection", function(ws) {
 		var msg = jsonobj.msg;
 		var content = jsonobj.content;
 
-
 		if(msg == 'client_join'){
-
-			console.log('server received client_join from %s', content.timestamp);
-
-
+			//console.log('server received client_join from %s', content.timestamp);
 			ws.send(JSON.stringify(  {'msg':'send_userlist',  'content':{'userlist': Clients}    }));
 			Clients[content.timestamp] = content.position;
-
 			//content = { timestamp: , position: }
 			wss.broadcast(JSON.stringify(  {'msg':'broadcast_join',  'content':content}   ));
-
 			//send the client a full list of online clients and thier positions
-			
 			//on a client join, save its unique timestamp it created;
 			ws.timestamp = content.timestamp;
 			//broadcast to to every client that this client A has joined  (client A willl also get this)
-			//add the client info to central server object: clients
-
-
-			
-
-
+			//add the client info to central server object: client
 		}
 		else if(msg == 'client_move'){
 
@@ -81,33 +69,24 @@ wss.on("connection", function(ws) {
 			Clients[content.timestamp].y += content.displacement.y;
 			Clients[content.timestamp].z += content.displacement.z;
 
-
-
 		}
 		else{
 			console.log('message type not supported');
 		}
-
 	});
 
 	var id = setInterval(function() {
-		console.log(Clients);
-
-		//ws.send(JSON.stringify(  {'type':'timestamp', 'content':Date.now()}   ));
-		//wss.broadcast(JSON.stringify(  {'type':'','content':players} ));
-
+		ws.send(JSON.stringify( {'msg':'server_time', 'content':{'thetime':Date.now()}  }));
+		//wss.broadcast(JSON.stringify(  {'msg':'','content':{'':}}} ));
 	}, 100);
 
   	ws.on("close", function() {
-
     	console.log("websocket connection close");
     	//broadvast to all that this timestamp is leaving the game
     	wss.broadcast(JSON.stringify( {'msg':'broadcast_leave',  'content':{'timestamp':ws.timestamp}}  ));
     	//remove this timestamp from the central server clients object
     	//stop the useless interval broadcast that i might use later
     	delete Clients[ws.timestamp];
-
-
     	clearInterval(id);
  	});
 

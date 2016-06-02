@@ -15,6 +15,8 @@
     <script src="client.js"></script>
     <script>
 
+
+  
       // Our Javascript will go here.
       var scene = new THREE.Scene();
       var width =  window.innerWidth;
@@ -25,16 +27,19 @@
       renderer.setSize( window.innerWidth, window.innerHeight );
       document.body.appendChild( renderer.domElement );
       camera.position.z = 100;
-      var geometry = new THREE.BoxGeometry( 20, 20, 20);
-      var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
       window.addEventListener('keydown', handleKeyDown, false);
       window.addEventListener('keyup', handleKeyUp, false);
 
+      var geometry = new THREE.BoxGeometry( 20, 20, 20);
+      var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 
-      var players = {};
+      var my_start_position = new THREE.Vector3( 0, 1, 0 );
+
+
+
       //players = { {timestamp:, THREE.Object:}, {timestamp:, THREE.Object:} }
-      //the actual view objects, but this also holds the position data too.
-
+      //the actual objects view, (but this also holds the position data too.)
+      var players = {};
 
 
 
@@ -67,7 +72,8 @@
           window.isDDown = false;
         }
       }
-
+      //creates a new cube at position, adds it to both the scene 
+      // and adds it to the players object view
       function add_cube(cube_timestamp, position){
         var newbox = new THREE.Mesh( geometry, material );
         players[cube_timestamp] = newbox;
@@ -75,19 +81,18 @@
         players[cube_timestamp].position.set(position.x,position.y,position.z);
 
       }
-
+      //displace the cube, update position, and return the new position
       function move_cube(cube_timestamp, displacement){
 
-        players[cube_timestamp].position.add(displacement);
-        var new_position = players[cube_timestamp].position.clone();
-        //server_positions[cube_timestamp] = new_position;
+        var existing_cube = players[cube_timestamp];
+        existing_cube.position.add(displacement);
+        var new_position = existing_cube.position.clone();
         return new_position;
       }
-
+      //remove the cube from both the server
       function remove_cube(cube_timestamp){
         scene.remove(players[cube_timestamp]);
         delete players[cube_timestamp];
-        delete server_positions[cube_timestamp];
       }
 
       var render = function () {
