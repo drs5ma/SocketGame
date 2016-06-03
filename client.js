@@ -53,6 +53,8 @@ ws.onmessage = function (event) {
       }
     }
   }
+
+
   else if(msg == 'broadcast_join'){
 
     // var params = { 
