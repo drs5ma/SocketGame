@@ -31,11 +31,17 @@
       window.addEventListener('keyup', handleKeyUp, false);
 
       var geometry = new THREE.BoxGeometry( 20, 20, 20);
-      var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+      var myColor = new THREE.Color(0xffffff*Math.random());
+      var material = new THREE.MeshBasicMaterial( { color: myColor } );
 
       var my_start_position = new THREE.Vector3( 0, 1, 0 );
 
+      var up_displacement = new THREE.Vector3( 0, 1, 0 );
+      var down_displacement = new THREE.Vector3( 0, -1, 0 );
+      var left_displacement = new THREE.Vector3( -1, 0, 0 );
+      var right_displacement = new THREE.Vector3( 1, 0, 0 );
 
+      var velocity = 10.0;
 
       //players = { {timestamp:, THREE.Object:}, {timestamp:, THREE.Object:} }
       //the actual objects view, (but this also holds the position data too.)
@@ -75,6 +81,7 @@
       //creates a new cube at position, adds it to both the scene 
       // and adds it to the players object view
       function add_cube(cube_timestamp, position){
+
         var newbox = new THREE.Mesh( geometry, material );
         players[cube_timestamp] = newbox;
         scene.add(players[cube_timestamp]);
@@ -99,20 +106,16 @@
         requestAnimationFrame( render );
         //console.log(players);
         if(window.isWDown){
-            var vector_displacement = new THREE.Vector3( 0, 1, 0 );
-            send_server_move( vector_displacement );
+            send_server_move( up_displacement.clone().multiplyScalar(velocity ));
         }
         if(window.isSDown){
-            var vector_displacement = new THREE.Vector3( 0, -1, 0 );
-            send_server_move( vector_displacement );
+            send_server_move( down_displacement.clone().multiplyScalar(velocity) );
         }
         if(window.isADown){
-            var vector_displacement = new THREE.Vector3( -1, 0, 0 );
-            send_server_move( vector_displacement );
+            send_server_move( left_displacement.clone().multiplyScalar(velocity ));
         }
         if(window.isDDown){
-            var vector_displacement = new THREE.Vector3( 1, 0, 0 );
-            send_server_move( vector_displacement );
+            send_server_move( right_displacement.clone().multiplyScalar(velocity) );
         }
         renderer.render(scene, camera);
       };
