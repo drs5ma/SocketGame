@@ -45,7 +45,7 @@ console.log("websocket server created")
 
 wss.broadcast = function(data) {
 	for (var i in this.clients){
-		this.clients[i].send(data);
+		this.clients[i].send(data, function(error){});
 	}
 };
 
