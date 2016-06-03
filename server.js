@@ -5,10 +5,25 @@ var app = express()
 var port = process.env.PORT || 5000
 var router = express.Router();
 var path = require('path');
-var mongo = require('mongodb');
+//var mongo = require('mongodb');
+var mongoose = require ("mongoose"); // The reason for this demo.
 
 var Clients = {};//= {timestamp:position, timestamp:position}
 
+
+
+var mongoURI = 'localhost:27017/node-ws-test';
+var uristring = process.env.MONGODB_URI || mongoURI;
+var theport = process.env.PORT || 5000;
+
+
+mongoose.connect(uristring, function (err, res) {
+      if (err) {
+      console.log ('ERROR connecting to: ' + uristring + '. ' + err);
+      } else {
+      console.log ('Succeeded connected to: ' + uristring);
+      }
+});
 
 
 //routing
@@ -36,24 +51,24 @@ wss.broadcast = function(data) {
 
 
 
-var url = process.env.MONGOLAB_URI || 'mongodb://localhost:27017/test';
+// var url = process.env.MONGOLAB_URI || 'mongodb://localhost:27017/test';
 
-var mongoUri = process.env.MONGOLAB_URI || 'mongodb://localhost/test'
+// var mongoUri = process.env.MONGOLAB_URI || 'mongodb://localhost/test'
 
 
 
-var MongoClient = require('mongodb').MongoClient
-  , assert = require('assert');
+// var MongoClient = require('mongodb').MongoClient
+//   , assert = require('assert');
 
-// Connection URL
+// // Connection URL
 
-// Use connect method to connect to the server
-MongoClient.connect(url, function(err, db) {
-  assert.equal(null, err);
-  console.log("Connected succesfully to server");
+// // Use connect method to connect to the server
+// MongoClient.connect(url, function(err, db) {
+//   assert.equal(null, err);
+//   console.log("Connected succesfully to server");
 
-  db.close();
-});
+//   db.close();
+// });
 
 
 
