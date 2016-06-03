@@ -5,19 +5,11 @@
       body { margin: 0; }
       canvas { width: 100%; height: 100% }
     </style>
-
-
   </head>
-
-
-
   <body>
     <script src="js/three.min.js"></script>
     <script src="client.js"></script>
-    <script>
-
-
-  
+    <script>  
       // Our Javascript will go here.
       var scene = new THREE.Scene();
       var width =  window.innerWidth;
@@ -37,110 +29,94 @@
       var my_color;
       var my_start_position;
 
-
-      var me;
-
       if(sessionStorage.r){
         my_color = new THREE.Color(sessionStorage.r, sessionStorage.g, sessionStorage.b );
         my_start_position = new THREE.Vector3( Number(sessionStorage.x), Number(sessionStorage.y), 0 );
       }
       else{
-        my_color =  new THREE.Color((0xffffff/2.0) + (0xffffff*Math.random()/2.0));
-        sessionStorage.r = my_color.r;
-        sessionStorage.g = my_color.g;
-        sessionStorage.b = my_color.b;
-
+        my_color =  new THREE.Color( 0xffffff*Math.random() );
         var spawn_dist = 500; 
         var my_start_position = new THREE.Vector3( (Math.random()*spawn_dist)-(spawn_dist/2.0), (Math.random()*spawn_dist)-(spawn_dist/2.0), 0 );
 
       }
 
+      //save the color and position to sessionStorage
       window.onbeforeunload = function(event){
-
+        sessionStorage.r = my_color.r;
+        sessionStorage.g = my_color.g;
+        sessionStorage.b = my_color.b;
         sessionStorage.x = Number(me.position.x);
         sessionStorage.y = Number(me.position.y);
       }
 
-
-      
-
-
-      var material = new THREE.MeshBasicMaterial( { color: my_color } );
       var up_displacement = new THREE.Vector3( 0, 1, 0 );
       var down_displacement = new THREE.Vector3( 0, -1, 0 );
       var left_displacement = new THREE.Vector3( -1, 0, 0 );
       var right_displacement = new THREE.Vector3( 1, 0, 0 );
 
       var velocity = 10.0;
-
       //players = { {timestamp:, THREE.Object:}, {timestamp:, THREE.Object:} }
       //the actual objects view, (but this also holds the position data too.)
       var players = {};
-
-
+      var me;
 
       function handleKeyDown(event) {
         if (event.keyCode === 87) { //66 is "b"
-          window.isWDown = true;
-        }
+          window.isWDown = true;}
         if (event.keyCode === 65) { //66 is "b"
-          window.isADown = true;
-        }
+          window.isADown = true;}
         if (event.keyCode === 83) { //66 is "b"
-          window.isSDown = true;
-        }
+          window.isSDown = true;}
         if (event.keyCode === 68) { //66 is "b"
-          window.isDDown = true;
-        }
+          window.isDDown = true;}
       }
 
       function handleKeyUp(event) {
         if (event.keyCode === 87) {
-          window.isWDown = false;
-        }
+          window.isWDown = false;}
         if (event.keyCode === 65) {
-          window.isADown = false;
-        }
+          window.isADown = false;}
         if (event.keyCode === 83) {
-          window.isSDown = false;
-        }
+          window.isSDown = false;}
         if (event.keyCode === 68) {
-          window.isDDown = false;
-        }
+          window.isDDown = false;}
       }
+
+
       //creates a new cube at position, adds it to both the scene 
       // and adds it to the players object view
       //params = {'position':{x:,y:,z:}, 'color':{r:,g:,b:}}
       function add_cube(cube_timestamp, params){
-
         var position = params.position;
-        var color = params.color;
+        var colorobj = new THREE.Color(params.color.r, params.color.r, params.color.b);
 
+
+        var material = new THREE.MeshBasicMaterial( { color: colorobj } );
         var newbox = new THREE.Mesh( geometry, material );
-        newbox.material.color.setRGB(color.r, color.r, color.b);
+
         players[cube_timestamp] = newbox;
         scene.add(players[cube_timestamp]);
         players[cube_timestamp].position.set(position.x,position.y,position.z);
-
         if (cube_timestamp == my_unique_id){
           me = players[cube_timestamp];
         }
-
-
       }
+
+
+
+
       //displace the cube, update position, and return the new position
       function move_cube(cube_timestamp, displacement){
-
         //change tjis to dispalcement =params.displacement
-
         var existing_cube = players[cube_timestamp];
         existing_cube.position.add(displacement);
         var new_position = existing_cube.position.clone();
         return new_position;
       }
+
+
       //remove the cube from both the server and the view
       function remove_cube(cube_timestamp){
-
         scene.remove(players[cube_timestamp]);
         delete players[cube_timestamp];
       }
@@ -148,9 +124,7 @@
       var render = function () {
         requestAnimationFrame( render );
         //console.log(players);
-
        // console.log(players[my_unique_id].position);
-
         if(window.isWDown){
             send_server_move( up_displacement.clone().multiplyScalar(velocity ));
         }

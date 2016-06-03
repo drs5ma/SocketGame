@@ -6,24 +6,15 @@ var port = process.env.PORT || 5000
 var router = express.Router();
 var path = require('path');
 //var mongo = require('mongodb');
+
 var mongoose = require ("mongoose"); // The reason for this demo.
-
-var Clients = {};//= {timestamp:position, timestamp:position}
-
-
-
-
-
 var mongoURI = 'localhost:27017/node-ws-test';
 var uristring = process.env.MONGODB_URI || mongoURI;
-
-
 mongoose.connect(uristring, function (err, res) {
       if (err) {
-      console.log ('ERROR connecting to: ' + uristring + '. ' + err);
-      } else {
-      console.log ('Succeeded connected to: ' + uristring);
-      }
+      console.log ('ERROR connecting to: ' + uristring + '. ' + err);} 
+      else {
+      console.log ('Succeeded connected to: ' + uristring);}
 });
 
 
@@ -38,43 +29,21 @@ var server = http.createServer(app)
 server.listen(port)
 console.log("http server listening on %d", port)
 
-
 //create web socket
 var wss = new WebSocketServer({server: server})
 console.log("websocket server created")
 
-
 wss.broadcast = function(data) {
 	for (var i in this.clients){
-		this.clients[i].send(data, function(error){});
+		if(this.clients[i].readyState == this.clients[0].OPEN){
+			this.clients[i].send(data, function(error){});
+		}
 	}
 };
 
 
-
-// var url = process.env.MONGOLAB_URI || 'mongodb://localhost:27017/test';
-
-// var mongoUri = process.env.MONGOLAB_URI || 'mongodb://localhost/test'
-
-
-
-// var MongoClient = require('mongodb').MongoClient
-//   , assert = require('assert');
-
-// // Connection URL
-
-// // Use connect method to connect to the server
-// MongoClient.connect(url, function(err, db) {
-//   assert.equal(null, err);
-//   console.log("Connected succesfully to server");
-
-//   db.close();
-// });
-
-
-
-
-
+//= {timestamp:{position:, color:}, timestamp:params}
+var Clients = {};
 
 
 
@@ -91,7 +60,10 @@ wss.on("connection", function(ws) {
 		if(msg == 'client_join'){
 			//console.log('server received client_join from %s', content.timestamp);
 			ws.send(JSON.stringify(  {'msg':'send_userlist',  'content':{'userlist': Clients}    }));
-			Clients[content.timestamp] = content.position;
+			Clients[content.timestamp] = {};
+			Clients[content.timestamp].position = content.position;
+			Clients[content.timestamp].color = content.color;
+
 			//content = { timestamp: , position: }
 			wss.broadcast(JSON.stringify(  {'msg':'broadcast_join',  'content':content}   ));
 			//send the client a full list of online clients and thier init positions and color
