@@ -5,6 +5,7 @@ var app = express()
 var port = process.env.PORT || 5000
 var router = express.Router();
 var path = require('path');
+var mongo = require('mongodb');
 
 var Clients = {};//= {timestamp:position, timestamp:position}
 
@@ -37,6 +38,7 @@ wss.broadcast = function(data) {
 
 var url = process.env.MONGOLAB_URI || 'mongodb://localhost:27017/test';
 
+var mongoUri = process.env.MONGOLAB_URI || 'mongodb://localhost/test'
 
 
 
