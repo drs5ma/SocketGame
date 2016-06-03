@@ -23,7 +23,9 @@ function send_server_move(displacement){
 ws.onopen = function(){
   my_unique_id =  Date.now();
   ws.send( JSON.stringify(  {'msg':'client_join', 
-                             'content':{'timestamp':my_unique_id,'position':my_start_position}}  ));
+                             'content':{'timestamp':my_unique_id,
+                                        'position':my_start_position,
+                                        'color':my_color}}  ));
 };
 
 
@@ -39,12 +41,27 @@ ws.onmessage = function (event) {
       var position = server_positions[i];
       //add all users logged in except myself
       if(timestamp != my_unique_id){
-        add_cube(timestamp, position);
+
+
+        var params = { 
+          position: position, 
+          color: {r:1.0,g:0.0,b:0.0}
+        };
+
+
+        add_cube(timestamp, params);
       }
     }
   }
   else if(msg == 'broadcast_join'){
-    add_cube(content.timestamp, content.position);
+
+    // var params = { 
+    //       position: conten.params.position, 
+    //       color: {r:1.0,g:0.0,b:0.0}
+    // };
+
+
+    add_cube(content.timestamp, content);
   }
   else if(msg=='broadcast_move'){
     var new_position = move_cube(content.timestamp, content.displacement);
@@ -53,7 +70,7 @@ ws.onmessage = function (event) {
     remove_cube(content.timestamp);
   }
   else{
-    console.log("msg type unsupported")
+    //console.log("msg type unsupported")
     // var timestamp = parseInt(jsonobj.content);
     // var tone = (timestamp%1000)/(1000.0);
     // color = new THREE.Color( tone, tone, tone );;

@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "express": "^4.4.5",
+    "mongodb": "^2.1.21",
     "ws": "0.4.x"
   },
   "engines": {
@@ -16,5 +17,3 @@
     "start": "node server.js"
   }
 }
-
-

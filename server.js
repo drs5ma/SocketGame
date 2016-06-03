@@ -35,6 +35,30 @@ wss.broadcast = function(data) {
 
 
 
+var url = process.env.MONGOLAB_URI || 'mongodb://localhost:27017/test';
+
+
+
+
+var MongoClient = require('mongodb').MongoClient
+  , assert = require('assert');
+
+// Connection URL
+
+// Use connect method to connect to the server
+MongoClient.connect(url, function(err, db) {
+  assert.equal(null, err);
+  console.log("Connected succesfully to server");
+
+  db.close();
+});
+
+
+
+
+
+
+
 
 wss.on("connection", function(ws) {
 
@@ -52,7 +76,7 @@ wss.on("connection", function(ws) {
 			Clients[content.timestamp] = content.position;
 			//content = { timestamp: , position: }
 			wss.broadcast(JSON.stringify(  {'msg':'broadcast_join',  'content':content}   ));
-			//send the client a full list of online clients and thier positions
+			//send the client a full list of online clients and thier init positions and color
 			//on a client join, save its unique timestamp it created;
 			ws.timestamp = content.timestamp;
 			//broadcast to to every client that this client A has joined  (client A willl also get this)
@@ -71,7 +95,7 @@ wss.on("connection", function(ws) {
 
 		}
 		else{
-			console.log('message type not supported');
+			//console.log('message type not supported');
 		}
 	});
 
