@@ -10,12 +10,14 @@
     <script src="js/three.min.js"></script>
     <script src="client.js"></script>
     <script>  
+      //window.snap = require('snapsvg');
+
       // Our Javascript will go here.
       var scene = new THREE.Scene();
       var width =  window.innerWidth;
       var height = window.innerHeight;
       //var camera = new THREE.PerspectiveCamera( 75,/, 0.1, 1000 );
-      var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+      var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 0.0001, 100000 );
       var renderer = new THREE.WebGLRenderer();
       renderer.setSize( window.innerWidth, window.innerHeight );
       document.body.appendChild( renderer.domElement );
@@ -23,8 +25,8 @@
       window.addEventListener('keydown', handleKeyDown, false);
       window.addEventListener('keyup', handleKeyUp, false);
 
-      var geometry = new THREE.BoxGeometry( 20, 20, 20);
-      var geometry = new THREE.SphereGeometry( 5, 32, 32 );
+      var geometry = new THREE.BoxGeometry( 24, 24, 24);
+      //var geometry = new THREE.SphereGeometry( 24, 8, 8 );
 
       var my_color;
       var my_start_position;
@@ -87,16 +89,20 @@
       // and adds it to the players object view
       //params = {'position':{x:,y:,z:}, 'color':{r:,g:,b:}}
       function add_cube(cube_timestamp, params){
+        //DECODE THE  params
         var position = params.position;
         var colorobj = new THREE.Color(params.color.r, params.color.r, params.color.b);
 
-
+        //create view
         var material = new THREE.MeshBasicMaterial( { color: colorobj } );
         var newbox = new THREE.Mesh( geometry, material );
-
+        //add view and save in players
         players[cube_timestamp] = newbox;
         scene.add(players[cube_timestamp]);
+
+        //set position
         players[cube_timestamp].position.set(position.x,position.y,position.z);
+        //set me variable
         if (cube_timestamp == my_unique_id){
           me = players[cube_timestamp];
         }
@@ -123,8 +129,14 @@
 
       var render = function () {
         requestAnimationFrame( render );
+        console.log(me.position.x,my_start_position.x );
+        var newx =  me.position.x ||  my_start_position.x;
+        camera.position.setX(newx);
+        var newy =  me.position.y ||  my_start_position.y;
+        camera.position.setY(newy);
         //console.log(players);
        // console.log(players[my_unique_id].position);
+
         if(window.isWDown){
             send_server_move( up_displacement.clone().multiplyScalar(velocity ));
         }

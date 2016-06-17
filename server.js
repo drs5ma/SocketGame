@@ -5,6 +5,7 @@ var app = express()
 var port = process.env.PORT || 5000
 var router = express.Router();
 var path = require('path');
+
 //var mongo = require('mongodb');
 
 var mongoose = require ("mongoose"); // The reason for this demo.
@@ -16,6 +17,7 @@ mongoose.connect(uristring, function (err, res) {
       else {
       console.log ('Succeeded connected to: ' + uristring);}
 });
+
 
 
 //routing
